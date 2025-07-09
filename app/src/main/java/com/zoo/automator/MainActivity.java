@@ -1,8 +1,10 @@
 package com.zoo.automator;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
+import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
@@ -32,7 +34,12 @@ public class MainActivity extends AppCompatActivity {
         binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                // Call RhinoDemo and show result in the TextView
+                String result = RhinoDemo.runDemo();
+                TextView rhinoResult = findViewById(R.id.text_rhino_result);
+                rhinoResult.setText(result);
+                Log.d("debug", "Rhino result: " + result);
+                Snackbar.make(view, "Rhino executed!", Snackbar.LENGTH_LONG)
                         .setAction("Action", null)
                         .setAnchorView(R.id.fab).show();
             }
