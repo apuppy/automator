@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
+import android.view.LayoutInflater;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -116,6 +118,27 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        FrameLayout bottomNavContainer = findViewById(R.id.bottom_nav_container);
+        com.google.android.material.bottomnavigation.BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+        LayoutInflater inflater = LayoutInflater.from(this);
+        // Do not show dashboard by default, leave container empty
+        bottomNavContainer.removeAllViews();
+        bottomNavigation.setOnItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.nav_dashboard) {
+                // Show dashboard in the container, do not start a new activity
+                bottomNavContainer.removeAllViews();
+                bottomNavContainer.addView(inflater.inflate(R.layout.page_dashboard, bottomNavContainer, false));
+                setContentMainVisibility(false);
+                return true;
+            } else if (item.getItemId() == R.id.nav_setting) {
+                // Show setting in the container, do not start a new activity
+                bottomNavContainer.removeAllViews();
+                bottomNavContainer.addView(inflater.inflate(R.layout.page_setting, bottomNavContainer, false));
+                setContentMainVisibility(false);
+                return true;
+            }
+            return false;
+        });
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
         // Passing each menu ID as a set of Ids because each
@@ -127,6 +150,18 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        // Handle left drawer navigation for Home
+        navigationView.setNavigationItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.nav_home) {
+                // When Home is selected from the drawer, show content_main controls and clear the container
+                setContentMainVisibility(true);
+                bottomNavContainer.removeAllViews();
+                return true;
+            }
+            // Let NavigationUI handle other items
+            return NavigationUI.onNavDestinationSelected(item, Navigation.findNavController(this, R.id.nav_host_fragment_content_main));
+        });
     }
 
     @Override
@@ -167,5 +202,15 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return false;
+    }
+
+    // Helper to show/hide content_main controls
+    private void setContentMainVisibility(boolean visible) {
+        int v = visible ? View.VISIBLE : View.GONE;
+        findViewById(R.id.text_rhino_result).setVisibility(v);
+        findViewById(R.id.button_rhino).setVisibility(v);
+        findViewById(R.id.button_http_request).setVisibility(v);
+        findViewById(R.id.button_open_accessibility_settings).setVisibility(v);
+        findViewById(R.id.button_run_chrome_automation).setVisibility(v);
     }
 }
