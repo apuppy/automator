@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -17,6 +18,14 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.zoo.automator.databinding.ActivityMainBinding;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,6 +51,41 @@ public class MainActivity extends AppCompatActivity {
                 Snackbar.make(view, "Rhino executed!", Snackbar.LENGTH_LONG)
                         .setAction("Action", null)
                         .setAnchorView(R.id.fab).show();
+            }
+        });
+        // HTTP Request button logic
+        Button httpButton = findViewById(R.id.button_http_request);
+        httpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                OkHttpClient client = new OkHttpClient();
+                // Create POST data
+                okhttp3.MediaType JSON = okhttp3.MediaType.parse("application/json; charset=utf-8");
+                String jsonBody = "{\"field1\":\"value1\",\"field2\":\"value2\"}";
+                okhttp3.RequestBody body = okhttp3.RequestBody.create(jsonBody, JSON);
+                // Build request with headers
+                Request request = new Request.Builder()
+                        .url("https://httpbin.org/post")
+                        .addHeader("Custom-Header", "HeaderValue")
+                        .addHeader("Another-Header", "AnotherValue")
+                        .post(body)
+                        .build();
+                client.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        Log.e("HTTP", "Request failed", e);
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        if (response.body() != null) {
+                            String body = response.body().string();
+                            Log.d("HTTP", "Response: " + body);
+                        } else {
+                            Log.d("HTTP", "Empty response body");
+                        }
+                    }
+                });
             }
         });
         DrawerLayout drawer = binding.drawerLayout;
