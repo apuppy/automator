@@ -19,14 +19,44 @@
         android:textSize="18sp"/>
 
     <Button
-        android:id="@+id/button_http_request"
+        android:id="@+id/button_rhino"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="HTTP Request"
+        android:text="Rhino Script"
         app:layout_constraintTop_toBottomOf="@id/text_rhino_result"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginTop="24dp"/>
+
+    <Button
+        android:id="@+id/button_http_request"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="HTTP Request"
+        app:layout_constraintTop_toBottomOf="@id/button_rhino"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="16dp"/>
+
+    <Button
+        android:id="@+id/button_open_accessibility_settings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enable Accessibility"
+        app:layout_constraintTop_toBottomOf="@id/button_http_request"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="16dp"/>
+
+    <Button
+        android:id="@+id/button_run_chrome_automation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Open Chrome and Enter URL"
+        app:layout_constraintTop_toBottomOf="@id/button_open_accessibility_settings"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="16dp"/>
 
     <fragment
         android:id="@+id/nav_host_fragment_content_main"
@@ -36,6 +66,6 @@
         app:defaultNavHost="true"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/button_http_request"
+        app:layout_constraintTop_toBottomOf="@id/button_run_chrome_automation"
         app:navGraph="@navigation/mobile_navigation" />
 </androidx.constraintlayout.widget.ConstraintLayout>

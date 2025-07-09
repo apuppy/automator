@@ -40,7 +40,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.appBarMain.toolbar);
-        binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
+        Button fabActionButton = findViewById(R.id.button_rhino);
+        fabActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Call RhinoDemo and show result in the TextView
@@ -48,13 +49,11 @@ public class MainActivity extends AppCompatActivity {
                 TextView rhinoResult = findViewById(R.id.text_rhino_result);
                 rhinoResult.setText(result);
                 Log.d("debug", "Rhino result: " + result);
-                Snackbar.make(view, "Rhino executed!", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null)
-                        .setAnchorView(R.id.fab).show();
             }
         });
         // HTTP Request button logic
         Button httpButton = findViewById(R.id.button_http_request);
+        TextView rhinoResult = findViewById(R.id.text_rhino_result);
         httpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,11 +72,14 @@ public class MainActivity extends AppCompatActivity {
                 client.newCall(request).enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
+                        runOnUiThread(() -> rhinoResult.setText("HTTP request failed: " + e.getMessage()));
                         Log.e("HTTP", "Request failed", e);
                     }
 
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
+                        String msg = "HTTP response status: " + response.code();
+                        runOnUiThread(() -> rhinoResult.setText(msg));
                         if (response.body() != null) {
                             String body = response.body().string();
                             Log.d("HTTP", "Response: " + body);
@@ -86,6 +88,32 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
+            }
+        });
+        // Accessibility settings button logic
+        Button accessibilityButton = findViewById(R.id.button_open_accessibility_settings);
+        accessibilityButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Open the system accessibility settings and wait for result using Activity Result API
+                android.content.Intent intent = new android.content.Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                accessibilitySettingsLauncher.launch(intent);
+            }
+        });
+        // Chrome automation button logic
+        Button chromeButton = findViewById(R.id.button_run_chrome_automation);
+        chromeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Try to launch Chrome using ACTION_VIEW with a dummy URL
+                android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("http://www.bing.com"));
+                intent.setPackage("com.android.chrome");
+                intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+                try {
+                    startActivity(intent);
+                } catch (android.content.ActivityNotFoundException e) {
+                    Snackbar.make(v, "Chrome is not installed.", Snackbar.LENGTH_LONG).show();
+                }
             }
         });
         DrawerLayout drawer = binding.drawerLayout;
@@ -113,5 +141,31 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    // Use Activity Result API instead of deprecated startActivityForResult
+    private final androidx.activity.result.ActivityResultLauncher<android.content.Intent> accessibilitySettingsLauncher =
+            registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(), result -> {
+                // User returned from accessibility settings, check if service is enabled
+                if (isAccessibilityServiceEnabled()) {
+                    Snackbar.make(findViewById(android.R.id.content), "Accessibility enabled!", Snackbar.LENGTH_LONG).show();
+                } else {
+                    Snackbar.make(findViewById(android.R.id.content), "Accessibility not enabled.", Snackbar.LENGTH_LONG).show();
+                }
+            });
+
+    private boolean isAccessibilityServiceEnabled() {
+        android.content.ComponentName expectedComponentName = new android.content.ComponentName(this, com.zoo.automator.MyAccessibilityService.class);
+        android.text.TextUtils.SimpleStringSplitter colonSplitter = new android.text.TextUtils.SimpleStringSplitter(':');
+        String enabledServices = android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+        if (enabledServices == null) return false;
+        colonSplitter.setString(enabledServices);
+        while (colonSplitter.hasNext()) {
+            String componentName = colonSplitter.next();
+            if (componentName.equalsIgnoreCase(expectedComponentName.flattenToString())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
