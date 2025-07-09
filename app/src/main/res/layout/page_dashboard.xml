@@ -9,4 +9,12 @@
         android:layout_height="wrap_content"
         android:text="Dashboard Placeholder"
         android:textSize="24sp"/>
+
+    <Button
+        android:id="@+id/button_run_js_demo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Run JS Demo"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="24dp"/>
 </FrameLayout>

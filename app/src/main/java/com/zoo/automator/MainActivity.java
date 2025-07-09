@@ -125,16 +125,10 @@ public class MainActivity extends AppCompatActivity {
         bottomNavContainer.removeAllViews();
         bottomNavigation.setOnItemSelectedListener(item -> {
             if (item.getItemId() == R.id.nav_dashboard) {
-                // Show dashboard in the container, do not start a new activity
-                bottomNavContainer.removeAllViews();
-                bottomNavContainer.addView(inflater.inflate(R.layout.page_dashboard, bottomNavContainer, false));
-                setContentMainVisibility(false);
+                startActivity(new android.content.Intent(this, DashboardActivity.class));
                 return true;
             } else if (item.getItemId() == R.id.nav_setting) {
-                // Show setting in the container, do not start a new activity
-                bottomNavContainer.removeAllViews();
-                bottomNavContainer.addView(inflater.inflate(R.layout.page_setting, bottomNavContainer, false));
-                setContentMainVisibility(false);
+                startActivity(new android.content.Intent(this, SettingActivity.class));
                 return true;
             }
             return false;
